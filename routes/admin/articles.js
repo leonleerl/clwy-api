@@ -3,17 +3,25 @@ const router = express.Router();
 const { Article } = require("../../models");
 
 router.get("/", async function (req, res) {
-  const condition = {
-    order: [["id", "DESC"]],
-  };
-  const articles = await Article.findAll(condition);
-  res.json({
-    status: true,
-    message: "查询文章成功",
-    data: {
-      articles,
-    },
-  });
+  try {
+    const condition = {
+      order: [["id", "DESC"]],
+    };
+    const articles = await Article.findAll(condition);
+    res.json({
+      status: true,
+      message: "查询文章成功",
+      data: {
+        articles,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: "查询文章失败",
+      errors: [eroor.message],
+    });
+  }
 });
 
 module.exports = router;
