@@ -86,7 +86,9 @@ router.get("/:id", async function (req, res) {
 
 router.post("/", async function (req, res) {
   try {
+    // 白名单过滤
     const body = filterBody(req);
+
     const article = await Article.create(body);
     res.status(201).json({
       status: true,
@@ -94,11 +96,27 @@ router.post("/", async function (req, res) {
       data: article,
     });
   } catch (error) {
-    res.status(500).json({
-      status: false,
-      message: "创建文章失败",
-      errors: [eroor.message],
-    });
+    if (error.name === "SequelizeValidationError") {
+      const errors = error.errors.map((e) => e.message);
+
+      res.status(400).json({
+        status: false,
+        message: "请求参数错误。",
+        errors,
+      });
+    } else {
+      res.status(500).json({
+        status: false,
+        message: "创建文章失败。",
+        errors: [error.message],
+      });
+    }
+
+    // res.status(500).json({
+    //   status: false,
+    //   message: "创建文章失败",
+    //   errors: [eroor.message],
+    // });
   }
 });
 
