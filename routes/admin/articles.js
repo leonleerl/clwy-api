@@ -59,7 +59,13 @@ router.post("/", async function (req, res) {
       message: "创建文章成功",
       data: article,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: "创建文章失败",
+      errors: [eroor.message],
+    });
+  }
 });
 
 router.delete("/:id", async function (req, res) {
@@ -79,7 +85,39 @@ router.delete("/:id", async function (req, res) {
         errors: [error.message],
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: "删除文章失败",
+      errors: [eroor.message],
+    });
+  }
+});
+
+router.put("/:id", async function (req, res) {
+  try {
+    const { id } = req.params;
+    const article = await Article.findByPk(id);
+    if (article) {
+      await article.update(req.body);
+      res.json({
+        status: true,
+        message: "更新文章成功",
+      });
+    } else {
+      res.status(404).json({
+        status: false,
+        message: "文章未找到",
+        errors: [error.message],
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: "查找文章失败",
+      errors: [eroor.message],
+    });
+  }
 });
 
 module.exports = router;
