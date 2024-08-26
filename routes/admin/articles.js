@@ -1,12 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const { Article } = require("../../models");
+const { Op } = require("sequelize");
 
 router.get("/", async function (req, res) {
   try {
+    const query = req.query;
+
     const condition = {
       order: [["id", "DESC"]],
     };
+
+    if (query.title) {
+      condition.where = {
+        title: {
+          [Op.like]: `%${query.title}%`,
+        },
+      };
+    }
     const articles = await Article.findAll(condition);
     res.json({
       status: true,
