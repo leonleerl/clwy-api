@@ -7,8 +7,19 @@ router.get("/", async function (req, res) {
   try {
     const query = req.query;
 
+    // 当前是第几页，如果不传，那就是第一页
+    const currentPage = Math.abs(Number(query.currentPage)) || 1;
+
+    // 每页显示多少条数据，如果不传，那就显示10条
+    const pageSize = Math.abs(Number(query.pageSize)) || 10;
+
+    // 计算 offset
+    const offset = (currentPage - 1) * pageSize;
+
     const condition = {
       order: [["id", "DESC"]],
+      limit: pageSize,
+      offset: offset,
     };
 
     if (query.title) {
@@ -18,12 +29,23 @@ router.get("/", async function (req, res) {
         },
       };
     }
-    const articles = await Article.findAll(condition);
+
+    // 将 findAll 方法改为 findAndCountAll 方法
+    // findAndCountAll 方法会返回一个对象，对象中有两个属性，一个是 count，一个是 rows，
+    // count 是查询到的数据的总数，rows 中才是最终查询到的数据
+    const { count, rows } = await Article.findAndCountAll(condition);
+
+    // 返回查询结果
     res.json({
       status: true,
-      message: "查询文章成功",
+      message: "查询文章列表成功。",
       data: {
-        articles,
+        articles: rows,
+        pagination: {
+          total: count,
+          currentPage,
+          pageSize,
+        },
       },
     });
   } catch (error) {
