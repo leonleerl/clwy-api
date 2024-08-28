@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Article.init(
     {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER.UNSIGNED,
+      },
       title: {
         type: DataTypes.STRING,
         allowNull: false,
