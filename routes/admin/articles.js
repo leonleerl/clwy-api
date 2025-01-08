@@ -96,19 +96,28 @@ router.get("/:id", async function (req, res) {
   }
 });
 
+/**
+ * 创建文章
+ * POST /admin/articles
+ */
 router.post("/", async function (req, res) {
   try {
-    const article = await Article.create(req.body);
+    // 白名单过滤
+    const body = filterBody(req);
+
+    // 使用过滤好的 body 数据，创建文章
+    const article = await Article.create(body);
+
     res.status(201).json({
       status: true,
-      message: "创建文章成功",
+      message: "创建文章成功。",
       data: article,
     });
   } catch (error) {
     res.status(500).json({
       status: false,
-      message: "创建文章失败",
-      error: [error.message],
+      message: "创建文章失败。",
+      errors: [error.message],
     });
   }
 });
@@ -151,10 +160,12 @@ router.delete("/:id", async function (req, res) {
 router.put("/:id", async function (req, res) {
   try {
     const { id } = req.params;
-    const article = await Article.findByPk(id);
+    // 白名单过滤
+    const body = filterBody(req);
 
+    const article = await Article.findByPk(id);
     if (article) {
-      await article.update(req.body);
+      await article.update(body);
 
       res.json({
         status: true,
@@ -170,10 +181,22 @@ router.put("/:id", async function (req, res) {
   } catch (error) {
     res.status(500).json({
       status: false,
-      message: "更新文章失败。",
+      message: "创建文章失败。",
       errors: [error.message],
     });
   }
 });
+
+/**
+ * 公共方法：白名单过滤
+ * @param req
+ * @returns {{title, content: (string|string|DocumentFragment|*)}}
+ */
+function filterBody(req) {
+  return {
+    title: req.body.title,
+    content: req.body.content,
+  };
+}
 
 module.exports = router;
