@@ -9,7 +9,7 @@ module.exports = {
     for (let i = 1; i <= counts; i++) {
       const article = {
         title: `文章的标题 ${i}`,
-        cont: `文章的内容 ${i}`,
+        content: `文章的内容 ${i}`,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
